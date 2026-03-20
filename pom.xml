@@ -25,6 +25,11 @@
             <artifactId>obd-java-api</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>eu.hansolo</groupId>
+            <artifactId>medusa</artifactId>
+            <version>21.0.9</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -18,11 +18,11 @@ public class App extends Application {
     @SuppressWarnings("exports")
     @Override
     public void start(Stage stage) throws IOException {
-        // scene = new Scene(loadFXML("primary"));
-        // stage.setScene(scene);
-        // stage.show();
-        ObdReader diddy = new ObdReader();
-        diddy.startobdRead();
+        scene = new Scene(loadFXML("mainScreen"));
+        stage.setScene(scene);
+        stage.show();
+        //ObdReader diddy = new ObdReader();
+        //diddy.startobdRead();
     }
 
     static void setRoot(String fxml) throws IOException {
@@ -36,7 +36,6 @@ public class App extends Application {
 
     public static void main(String[] args) {
         launch();
-        
     }
 
 }
