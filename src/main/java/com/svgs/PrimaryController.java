@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
 public class PrimaryController{
@@ -19,6 +20,9 @@ public class PrimaryController{
     
     @FXML
     private AnchorPane poop;
+
+    @FXML
+    private HBox vbux;
 
     @FXML
     void makeGauge(ActionEvent event) {
@@ -32,7 +36,7 @@ public class PrimaryController{
     .barColor(Color.RED)
     .animated(true)
     .build();
-    poop.getChildren().add(gauge);
+    vbux.getChildren().add(gauge);
     }
 
 }

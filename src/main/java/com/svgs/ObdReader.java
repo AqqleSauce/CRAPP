@@ -64,5 +64,4 @@ public class ObdReader {
         return (shortFuelTrim+"/"+longFuelTrim);
     }
 
-    
 }
