@@ -1,5 +1,6 @@
 package com.svgs;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import eu.hansolo.medusa.Gauge;
@@ -24,10 +25,9 @@ public class PrimaryController{
     @FXML
     private HBox vbux;
 
-    @FXML
     void makeGauge(ActionEvent event) {
         Gauge gauge = GaugeBuilder.create()
-    .skinType(SkinType.GAUGE) // Choose a skin type (e.g., LEVEL, MODERN, AMP, etc.)
+    .skinType(SkinType.BULLET_CHART) // Choose a skin type (e.g., LEVEL, MODERN, AMP, etc.)
     .prefSize(400, 400)
     .title("Temperature")
     .unit("°C")
@@ -37,6 +37,47 @@ public class PrimaryController{
     .animated(true)
     .build();
     vbux.getChildren().add(gauge);
+    } //sort of a reference rn
+
+    @FXML
+    void addGaugeScreen(ActionEvent event) throws IOException {
+        App.setRoot("gaugeList");
     }
 
+    @FXML
+    void initialize(){
+        decider(); 
+    }
+
+    public void decider(){
+        Gauge gauge
+        for(int i =0; i<Data.gauges.size(); i++){
+            switch (Data.gauges.get(i)){
+                case(0): gauge = GaugeBuilder.create()
+                .skinType(SkinType.KPI)
+                .minValue(0)
+                .maxValue(15)
+                .threshold(8)
+                .thresholdVisible(true)
+                .build();
+                vbux.getChildren().add(gauge);
+                break;
+
+                case(1): gauge = GaugeBuilder.create()
+                .skinType(SkinType.LINEAR)
+                .maxValue(15)
+                .minValue(-15).build();
+                vbux.getChildren().add(gauge);
+                break;
+                
+                case(2): gauge = GaugeBuilder.create()
+                .skinType(SkinType.QUARTER)
+                .maxValue(80)
+                .minValue(0)
+                .build();
+                vbux.getChildren().add(gauge);
+                break;
+            }
+        }
+    }
 }

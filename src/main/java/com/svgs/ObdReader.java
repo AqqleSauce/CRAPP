@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import com.github.pires.obd.commands.control.TimingAdvanceCommand;
 import com.github.pires.obd.commands.fuel.FuelTrimCommand;
 import com.github.pires.obd.commands.pressure.BarometricPressureCommand;
 import com.github.pires.obd.commands.pressure.IntakeManifoldPressureCommand;
@@ -56,12 +57,25 @@ public class ObdReader {
     }
 
     public static String getFuelTrim(){
-        //returns fuel trim in format "stft/ltft" 
+        //returns fuel trim in format "stft" 
         FuelTrimCommand stft = new FuelTrimCommand(FuelTrim.SHORT_TERM_BANK_1);
         FuelTrimCommand ltft = new FuelTrimCommand(FuelTrim.LONG_TERM_BANK_1);
         String shortFuelTrim = stft.getFormattedResult();
         String longFuelTrim = ltft.getFormattedResult();
-        return (shortFuelTrim+"/"+longFuelTrim);
+        return (shortFuelTrim+"");
     }
 
+    public static String timingPosition(){
+        TimingAdvanceCommand timing = new TimingAdvanceCommand();
+        String timingDegrees = "";
+        try {
+        timing.run(socket.getInputStream(),socket.getOutputStream());
+        timingDegrees = timing.getCalculatedResult();
+        System.out.println(timingDegrees);
+        timingDegrees = timing.getFormattedResult();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return timingDegrees;
+    }
 }
