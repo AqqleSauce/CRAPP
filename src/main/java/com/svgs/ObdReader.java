@@ -5,7 +5,6 @@ import java.io.OutputStream;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.github.pires.obd.commands.control.TimingAdvanceCommand;
-import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.fuel.FuelTrimCommand;
 import com.github.pires.obd.commands.pressure.BarometricPressureCommand;
 import com.github.pires.obd.commands.pressure.IntakeManifoldPressureCommand;
@@ -34,34 +33,6 @@ public class ObdReader {
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();
                 System.out.println("streams");
-            
-        //     try {
-        //     send(outputStream, "ATZ\r");
-        //     Thread.sleep(1500);
-        //     readAvailable(inputStream);
-
-        //     send(outputStream, "ATE0\r");
-        //     Thread.sleep(500);
-        //     readAvailable(inputStream);
-
-        //     send(outputStream, "ATI\r");
-        //     Thread.sleep(500);
-        //     readAvailable(inputStream);
-
-        //     send(outputStream, "0100\r");    // ask what standard PIDs are supported
-        //     Thread.sleep(2000);
-        //     readAvailable(inputStream);
-
-        //     send(outputStream, "010C\r"); // RPM
-        //     Thread.sleep(1000);
-        //     readAvailable(inputStream);
-
-        // } finally {
-        //     inputStream.close();
-        //     outputStream.close();
-        //     socket.closePort();
-        // }
-    
            
             rawCommand(inputStream, outputStream, "ATZ");
             rawCommand(inputStream, outputStream, "ATE0");
@@ -83,9 +54,9 @@ public class ObdReader {
             // new SelectProtocolCommand(ObdProtocols.AUTO).run(inputStream, outputStream);
             // System.out.println("Protocol selected");
 
-            RPMCommand rpm = new RPMCommand();
-            rpm.run(inputStream, outputStream);
-            System.out.println(rpm.getRPM());
+            // RPMCommand rpm = new RPMCommand();
+            // rpm.run(inputStream, outputStream);
+            // System.out.println(rpm.getRPM());
 
             //starts the connection
 
@@ -127,29 +98,6 @@ public class ObdReader {
 
         throw new RuntimeException("Timeout waiting for response to " + cmd +
                 ". Partial: " + response);
-    }
-
-     private static void send(OutputStream out, String cmd) throws Exception {
-        System.out.println("Sending: " + cmd.trim());
-        out.write(cmd.getBytes());
-        out.flush();
-    }
-
-    private static void readAvailable(InputStream in) throws Exception {
-        long end = System.currentTimeMillis() + 3000;
-        StringBuilder sb = new StringBuilder();
-
-        while (System.currentTimeMillis() < end) {
-            while (in.available() > 0) {
-                int b = in.read();
-                if (b >= 0) {
-                    sb.append((char) b);
-                }
-            }
-            Thread.sleep(100);
-        }
-
-        System.out.println("Response: [" + sb.toString() + "]");
     }
 
     public static FloatProperty getBoost(){
