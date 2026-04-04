@@ -2,41 +2,157 @@ package com.svgs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
 
+import com.fazecast.jSerialComm.SerialPort;
 import com.github.pires.obd.commands.control.TimingAdvanceCommand;
+import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.fuel.FuelTrimCommand;
 import com.github.pires.obd.commands.pressure.BarometricPressureCommand;
 import com.github.pires.obd.commands.pressure.IntakeManifoldPressureCommand;
-import com.github.pires.obd.commands.protocol.EchoOffCommand;
-import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
-import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.enums.FuelTrim;
-import com.github.pires.obd.enums.ObdProtocols;
+
+import javafx.beans.property.FloatProperty;
+import javafx.beans.property.SimpleFloatProperty;
 
 public class ObdReader {
-    public static Socket socket;
+//  public static Socket socket;
+    public static SerialPort socket;
     public static InputStream inputStream;
     public static OutputStream outputStream;
 
     public static void startobdRead(){
         try {
+            socket = SerialPort.getCommPort("COM6");
+            socket.setBaudRate(9600);
+            if(!socket.openPort()){
+                System.out.println("Didn't open port!!");
+                return;
+            }
+                System.out.println("buh");
+                Thread.sleep(1000);
+
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();
+                System.out.println("streams");
+            
+        //     try {
+        //     send(outputStream, "ATZ\r");
+        //     Thread.sleep(1500);
+        //     readAvailable(inputStream);
 
-            new EchoOffCommand().run(inputStream, outputStream);
-            new LineFeedOffCommand().run(inputStream, outputStream);
-            new SelectProtocolCommand(ObdProtocols.AUTO).run(inputStream, outputStream);
+        //     send(outputStream, "ATE0\r");
+        //     Thread.sleep(500);
+        //     readAvailable(inputStream);
+
+        //     send(outputStream, "ATI\r");
+        //     Thread.sleep(500);
+        //     readAvailable(inputStream);
+
+        //     send(outputStream, "0100\r");    // ask what standard PIDs are supported
+        //     Thread.sleep(2000);
+        //     readAvailable(inputStream);
+
+        //     send(outputStream, "010C\r"); // RPM
+        //     Thread.sleep(1000);
+        //     readAvailable(inputStream);
+
+        // } finally {
+        //     inputStream.close();
+        //     outputStream.close();
+        //     socket.closePort();
+        // }
+    
+           
+            rawCommand(inputStream, outputStream, "ATZ");
+            rawCommand(inputStream, outputStream, "ATE0");
+            rawCommand(inputStream, outputStream, "ATL0");
+            rawCommand(inputStream, outputStream, "ATS0");
+            rawCommand(inputStream, outputStream, "ATAT1");
+            rawCommand(inputStream, outputStream, "ATSP0");
+           
+            System.out.println(rawCommand(inputStream, outputStream, "010C"));
+
+            // System.out.println("Starting pires stuff...");
+
+            // new EchoOffCommand().run(inputStream, outputStream);
+            // System.out.println("Echo off done");
+            // new LineFeedOffCommand().run(inputStream, outputStream);
+            // System.out.println("Line feed off done");
+            // new TimeoutCommand(62).run(inputStream, outputStream);
+            // System.out.println("Timeout set");
+            // new SelectProtocolCommand(ObdProtocols.AUTO).run(inputStream, outputStream);
+            // System.out.println("Protocol selected");
+
+            RPMCommand rpm = new RPMCommand();
+            rpm.run(inputStream, outputStream);
+            System.out.println(rpm.getRPM());
+
             //starts the connection
 
             System.out.println("Connected yo");
         } catch (Exception e) {
-            // TODO: handle exception
+            
             System.out.println(e);
         }
     }
 
-    public static float  getBoost(){
+    private static void clearInput(InputStream in) throws Exception {
+        Thread.sleep(300);
+        while (in.available() > 0) {
+            in.read();
+        }
+    }
+
+    private static String rawCommand(InputStream in, OutputStream out, String cmd) throws Exception {
+        clearInput(in);
+
+        out.write((cmd + "\r").getBytes());
+        out.flush();
+
+        StringBuilder response = new StringBuilder();
+        long end = System.currentTimeMillis() + 5000;
+
+        while (System.currentTimeMillis() < end) {
+            while (in.available() > 0) {
+                char c = (char) in.read();
+                response.append(c);
+                if (c == '>') {
+                    String result = response.toString();
+                    System.out.println(cmd + " -> " + result);
+                    return result;
+                }
+            }
+            Thread.sleep(20);
+        }
+
+        throw new RuntimeException("Timeout waiting for response to " + cmd +
+                ". Partial: " + response);
+    }
+
+     private static void send(OutputStream out, String cmd) throws Exception {
+        System.out.println("Sending: " + cmd.trim());
+        out.write(cmd.getBytes());
+        out.flush();
+    }
+
+    private static void readAvailable(InputStream in) throws Exception {
+        long end = System.currentTimeMillis() + 3000;
+        StringBuilder sb = new StringBuilder();
+
+        while (System.currentTimeMillis() < end) {
+            while (in.available() > 0) {
+                int b = in.read();
+                if (b >= 0) {
+                    sb.append((char) b);
+                }
+            }
+            Thread.sleep(100);
+        }
+
+        System.out.println("Response: [" + sb.toString() + "]");
+    }
+
+    public static FloatProperty getBoost(){
         String formattedResult;
         float barometricValue = 0;
         float manifoldValue =0;
@@ -53,7 +169,9 @@ public class ObdReader {
             System.out.println(e);
         }
         float boostPressure = manifoldValue-barometricValue;
-        return boostPressure;
+        FloatProperty observableFloat = new SimpleFloatProperty();
+        observableFloat.set(boostPressure);
+        return observableFloat;
     }
 
     public static String getFuelTrim(){
@@ -61,7 +179,7 @@ public class ObdReader {
         FuelTrimCommand stft = new FuelTrimCommand(FuelTrim.SHORT_TERM_BANK_1);
         FuelTrimCommand ltft = new FuelTrimCommand(FuelTrim.LONG_TERM_BANK_1);
         String shortFuelTrim = stft.getFormattedResult();
-        String longFuelTrim = ltft.getFormattedResult();
+        String longFuelTrim = ltft.getFormattedResult();//ignore for now
         return (shortFuelTrim+"");
     }
 

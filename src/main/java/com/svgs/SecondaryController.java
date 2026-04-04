@@ -49,6 +49,13 @@ public class SecondaryController {
         
         System.out.println(selected);
         Data.gauges.add(selected);
+        try {
+          App.setRoot("mainScreen");
+        } catch (Exception e) {
+          System.out.println("doTheThing error");
+          System.out.println(e);
+        }
+        
       }
 
     }

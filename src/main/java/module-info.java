@@ -5,6 +5,7 @@ module com.svgs {
     requires javafx.graphics;
     requires obd.java.api;
     requires eu.hansolo.medusa;
+    requires com.fazecast.jSerialComm;
 
     opens com.svgs to javafx.fxml;
     exports com.svgs;

@@ -7,7 +7,7 @@ import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.GaugeBuilder;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
+import javafx.fxml.FXML; // tried an animation thing for the gauges, didn't work, might try again
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -24,6 +24,8 @@ public class PrimaryController{
 
     @FXML
     private HBox vbux;
+
+    
 
     void makeGauge(ActionEvent event) {
         Gauge gauge = GaugeBuilder.create()
@@ -50,16 +52,18 @@ public class PrimaryController{
     }
 
     public void decider(){
-        Gauge gauge
+        Gauge gauge;
         for(int i =0; i<Data.gauges.size(); i++){
             switch (Data.gauges.get(i)){
                 case(0): gauge = GaugeBuilder.create()
+                .title("Boost Pressure")
                 .skinType(SkinType.KPI)
                 .minValue(0)
                 .maxValue(15)
                 .threshold(8)
                 .thresholdVisible(true)
                 .build();
+                gauge.valueProperty().bind(ObdReader.getBoost());
                 vbux.getChildren().add(gauge);
                 break;
 
@@ -76,6 +80,10 @@ public class PrimaryController{
                 .minValue(0)
                 .build();
                 vbux.getChildren().add(gauge);
+                break;
+
+                case(3):
+                
                 break;
             }
         }
