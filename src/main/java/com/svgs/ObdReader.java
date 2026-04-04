@@ -28,20 +28,19 @@ public class ObdReader {
                 return;
             }
                 System.out.println("buh");
-                Thread.sleep(1000);
 
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();
                 System.out.println("streams");
-           
+
             rawCommand(inputStream, outputStream, "ATZ");
             rawCommand(inputStream, outputStream, "ATE0");
             rawCommand(inputStream, outputStream, "ATL0");
             rawCommand(inputStream, outputStream, "ATS0");
             rawCommand(inputStream, outputStream, "ATAT1");
             rawCommand(inputStream, outputStream, "ATSP0");
-           
-            System.out.println(rawCommand(inputStream, outputStream, "010C"));
+
+            rawCommand(inputStream, outputStream, "010C");
 
             // System.out.println("Starting pires stuff...");
 
@@ -68,7 +67,6 @@ public class ObdReader {
     }
 
     private static void clearInput(InputStream in) throws Exception {
-        Thread.sleep(300);
         while (in.available() > 0) {
             in.read();
         }
