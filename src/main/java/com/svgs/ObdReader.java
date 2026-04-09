@@ -6,8 +6,6 @@ import java.io.OutputStream;
 import com.fazecast.jSerialComm.SerialPort;
 import com.github.pires.obd.commands.control.TimingAdvanceCommand;
 import com.github.pires.obd.commands.fuel.FuelTrimCommand;
-import com.github.pires.obd.commands.pressure.BarometricPressureCommand;
-import com.github.pires.obd.commands.pressure.IntakeManifoldPressureCommand;
 import com.github.pires.obd.enums.FuelTrim;
 
 import javafx.beans.property.FloatProperty;
@@ -33,18 +31,17 @@ public class ObdReader {
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();
                 System.out.println("streams");
-           
+
             rawCommand(inputStream, outputStream, "ATZ");
             rawCommand(inputStream, outputStream, "ATE0");
             rawCommand(inputStream, outputStream, "ATL0");
             rawCommand(inputStream, outputStream, "ATS0");
             rawCommand(inputStream, outputStream, "ATAT1");
             rawCommand(inputStream, outputStream, "ATSP0");
-           
-            System.out.println(rawCommand(inputStream, outputStream, "010C"));
+
+            rawCommand(inputStream, outputStream, "010C");
 
             // System.out.println("Starting pires stuff...");
-
             // new EchoOffCommand().run(inputStream, outputStream);
             // System.out.println("Echo off done");
             // new LineFeedOffCommand().run(inputStream, outputStream);
@@ -62,13 +59,11 @@ public class ObdReader {
 
             System.out.println("Connected yo");
         } catch (Exception e) {
-            
             System.out.println(e);
         }
     }
 
     private static void clearInput(InputStream in) throws Exception {
-        Thread.sleep(300);
         while (in.available() > 0) {
             in.read();
         }
@@ -100,19 +95,14 @@ public class ObdReader {
                 ". Partial: " + response);
     }
 
-    public static FloatProperty getBoost(){
+    public static FloatProperty getBoost(){ //rewrite bruh
         String formattedResult;
         float barometricValue = 0;
-        float manifoldValue =0;
+        float manifoldValue = 0;
+        //manifold - barometric = boost
         try {
-            BarometricPressureCommand beep = new BarometricPressureCommand();
-            IntakeManifoldPressureCommand boop = new IntakeManifoldPressureCommand();
-            beep.run(socket.getInputStream(), socket.getOutputStream());
-            boop.run(socket.getInputStream(), socket.getOutputStream());
-            manifoldValue = boop.getImperialUnit();
-            formattedResult = beep.getFormattedResult();
-            barometricValue = beep.getImperialUnit();
-            System.out.println(formattedResult);
+           
+
         } catch (Exception e) {
             System.out.println(e);
         }
