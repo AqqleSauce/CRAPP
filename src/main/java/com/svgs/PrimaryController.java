@@ -62,20 +62,25 @@ public class PrimaryController{
                 .maxValue(15)
                 .threshold(8)
                 .thresholdVisible(true)
+                .valueVisible(true)
                 .build();
-                gauge.valueProperty().bind(ObdReader.getBoost());
+                gauge.valueProperty().bind(ObdReader.boostProperty());
+                ObdReader.startBoostThread();
                 vbux.getChildren().add(gauge);
                 break;
 
                 case(1): gauge = GaugeBuilder.create()
                 .skinType(SkinType.LINEAR)
+                .title("Fuel Trim")
                 .maxValue(15)
                 .minValue(-15).build();
+                //gauge.valueProperty().bind(ObdReader);
                 vbux.getChildren().add(gauge);
                 break;
                 
                 case(2): gauge = GaugeBuilder.create()
                 .skinType(SkinType.QUARTER)
+                .title("Coolant Temperature")
                 .maxValue(80)
                 .minValue(0)
                 .build();
@@ -83,7 +88,31 @@ public class PrimaryController{
                 break;
 
                 case(3):
-                
+                break;
+
+                case(4): gauge = GaugeBuilder.create()
+                .skinType(SkinType.HORIZONTAL)
+                .title("RPMS")
+                .maxValue(7000)
+                .minValue(0)
+                .angleRange(120)
+                .valueVisible(true)
+                .build();
+                gauge.valueProperty().bind(ObdReader.revProperty());
+                ObdReader.startRpmsThread();
+                vbux.getChildren().add(gauge);
+                break;
+
+                case(5):
+                break;
+
+                case(6):
+                break;
+
+                case(7):
+                break;
+
+                case(8):
                 break;
             }
         }

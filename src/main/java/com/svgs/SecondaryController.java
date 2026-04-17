@@ -16,7 +16,7 @@ public class SecondaryController {
     private ListView<String> doodoo;
     
     ObservableList<String> names = FXCollections.observableArrayList(
-      "Boost Pressure",
+      "Boost Pressure (Not Currently Working",
       "Fuel Trim",
       "Fuel Pressure",
       "Coolant Temperature",
