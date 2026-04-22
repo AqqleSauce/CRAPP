@@ -27,8 +27,6 @@ public class SecondaryController {
       "Timing Position"
     );
 
-
-
     @FXML
     void initialize(){
       doodoo.setItems(names);
@@ -55,7 +53,6 @@ public class SecondaryController {
           System.out.println("doTheThing error");
           System.out.println(e);
         }
-        
       }
 
     }
