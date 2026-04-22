@@ -65,7 +65,8 @@ public class PrimaryController{
                 .valueVisible(true)
                 .build();
                 gauge.valueProperty().bind(ObdReader.boostProperty());
-                ObdReader.startBoostThread();
+                //ObdReader.startBoostThread();
+                ObdReader.gaugesToUse.add(ObdReader::getBoost);
                 vbux.getChildren().add(gauge);
                 break;
 
@@ -99,7 +100,8 @@ public class PrimaryController{
                 .valueVisible(true)
                 .build();
                 gauge.valueProperty().bind(ObdReader.revProperty());
-                ObdReader.startRpmsThread();
+                //ObdReader.startRpmsThread();
+                ObdReader.gaugesToUse.add(ObdReader::getRevs);
                 vbux.getChildren().add(gauge);
                 break;
 

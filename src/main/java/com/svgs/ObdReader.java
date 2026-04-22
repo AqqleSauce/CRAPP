@@ -2,6 +2,7 @@ package com.svgs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 import com.fazecast.jSerialComm.SerialPort;
 
@@ -16,6 +17,8 @@ public class ObdReader {
     public static OutputStream outputStream;
     public static final DoubleProperty boostValue = new SimpleDoubleProperty(0);
     public static final DoubleProperty revValue = new SimpleDoubleProperty(0);
+
+    public static ArrayList<Runnable> gaugesToUse = new ArrayList<>();
 
     public static void startobdRead(){
         try {
