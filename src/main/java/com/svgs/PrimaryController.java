@@ -63,6 +63,7 @@ public class PrimaryController{
                 .threshold(8)
                 .thresholdVisible(true)
                 .valueVisible(true)
+                .animated(true)
                 .build();
                 gauge.valueProperty().bind(ObdReader.boostProperty());
                 //ObdReader.startBoostThread();
@@ -73,22 +74,36 @@ public class PrimaryController{
                 case(1): gauge = GaugeBuilder.create()
                 .skinType(SkinType.LINEAR)
                 .title("Fuel Trim")
-                .maxValue(15)
-                .minValue(-15).build();
+                .maxValue(50)
+                .minValue(-50)
+                .animated(true)
+                .build();
+                gauge.valueProperty().bind(ObdReader.trimProperty());
+                ObdReader.gaugesToUse.add(ObdReader::getFuelTrim);             
                 //gauge.valueProperty().bind(ObdReader);
                 vbux.getChildren().add(gauge);
                 break;
                 
-                case(2): gauge = GaugeBuilder.create()
-                .skinType(SkinType.QUARTER)
+                case(3): gauge = GaugeBuilder.create()
+                .skinType(SkinType.FLAT)
                 .title("Coolant Temperature")
-                .maxValue(80)
+                .maxValue(120)
                 .minValue(0)
+                .animated(true)
                 .build();
+                gauge.valueProperty().bind(ObdReader.coolantProperty());
+                ObdReader.gaugesToUse.add(ObdReader::getCoolantTemp);
                 vbux.getChildren().add(gauge);
                 break;
 
-                case(3):
+                case(2): gauge = GaugeBuilder.create()
+                .skinType(SkinType.LCD)
+                .title("Fuel Pressure")
+                .animated(true)
+                .build();
+                gauge.valueProperty().bind(ObdReader.fuelPressureProperty());
+                ObdReader.gaugesToUse.add(ObdReader::getFuelPressure);
+                vbux.getChildren().add(gauge);
                 break;
 
                 case(4): gauge = GaugeBuilder.create()
@@ -98,6 +113,7 @@ public class PrimaryController{
                 .minValue(0)
                 .angleRange(120)
                 .valueVisible(true)
+                .animated(true)
                 .build();
                 gauge.valueProperty().bind(ObdReader.revProperty());
                 //ObdReader.startRpmsThread();
@@ -105,16 +121,56 @@ public class PrimaryController{
                 vbux.getChildren().add(gauge);
                 break;
 
-                case(5):
+                case(5): gauge = GaugeBuilder.create()
+                .skinType(SkinType.MODERN)
+                .title("Engine Load")
+                .maxValue(100)
+                .minValue(0)
+                .valueVisible(true)
+                .build();
+                gauge.valueProperty().bind(ObdReader.loadProperty());
+                ObdReader.gaugesToUse.add(ObdReader::getEngineLoad);
+                vbux.getChildren().add(gauge);
                 break;
 
-                case(6):
+                case(6): gauge = GaugeBuilder.create()
+                .skinType(SkinType.HORIZONTAL)
+                .title("Speed")
+                .angleRange(120)
+                .maxValue(160)
+                .minValue(0)
+                .valueVisible(true)
+                .animated(true)
+                .build();
+                gauge.valueProperty().bind(ObdReader.speedProperty());
+                ObdReader.gaugesToUse.add(ObdReader::getVehicleSpeed);
+                vbux.getChildren().add(gauge);
                 break;
 
-                case(7):
+                case(7): gauge = GaugeBuilder.create()
+                .skinType(SkinType.LINEAR)
+                .title("Throttle Position")
+                .animated(true)
+                .maxValue(100)
+                .minValue(0)
+                .valueVisible(true)
+                .build();
+                gauge.valueProperty().bind(ObdReader.throttleProperty());
+                ObdReader.gaugesToUse.add(ObdReader::getThrottlePosition);
+                vbux.getChildren().add(gauge);
                 break;
 
-                case(8):
+                case(8): gauge = GaugeBuilder.create()
+                .skinType(SkinType.SIMPLE_DIGITAL)
+                .title("Timing Advance")
+                .animated(true)
+                .maxValue(100)
+                .minValue(-100)
+                .valueVisible(true)
+                .build();
+                gauge.valueProperty().bind(ObdReader.timingProperty());
+                ObdReader.gaugesToUse.add(ObdReader::getTimingPosition);
+                vbux.getChildren().add(gauge);
                 break;
             }
         }
