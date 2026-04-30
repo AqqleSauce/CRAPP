@@ -13,7 +13,7 @@ public class SecondaryController {
     private Button addAddGaugeButton;
 
     @FXML
-    private ListView<String> doodoo;
+    private ListView<String> parList;
     
     ObservableList<String> names = FXCollections.observableArrayList(
       "Boost Pressure",
@@ -29,12 +29,12 @@ public class SecondaryController {
 
     @FXML
     void initialize(){
-      doodoo.setItems(names);
+      parList.setItems(names);
     }
 
     @FXML
     void doTheThing(ActionEvent event){
-      if(doodoo.getSelectionModel().getSelectedItem() == null){
+      if(parList.getSelectionModel().getSelectedItem() == null){
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("None Selected Warning");
         alert.setHeaderText("Select One! or not");
@@ -43,7 +43,7 @@ public class SecondaryController {
         return;
       }
       else{
-        int selected = doodoo.getSelectionModel().getSelectedIndex();
+        int selected = parList.getSelectionModel().getSelectedIndex();
         
         System.out.println(selected);
         Data.gauges.add(selected);
