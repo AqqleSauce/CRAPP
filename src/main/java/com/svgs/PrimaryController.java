@@ -49,9 +49,11 @@ public class PrimaryController{
     @FXML
     void initialize(){
         decider(); 
+        ObdReader.dodat();
     }
 
     public void decider(){
+        
         Gauge gauge;
         for(int i =0; i<Data.gauges.size(); i++){
             switch (Data.gauges.get(i)){

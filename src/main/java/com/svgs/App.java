@@ -21,7 +21,8 @@ public class App extends Application {
         scene = new Scene(loadFXML("mainScreen"));
         stage.setScene(scene);
         stage.show();
-        //ObdReader.startobdRead();
+        ObdReader.startobdRead();
+        // SaveManager.startDrive();
     }
 
     static void setRoot(String fxml) throws IOException {

@@ -24,14 +24,13 @@ public class ObdReader {
     public static final DoubleProperty speedValue = new SimpleDoubleProperty(0);
     public static final DoubleProperty throttleValue = new SimpleDoubleProperty(0);
     public static final DoubleProperty timingValue = new SimpleDoubleProperty(0);
-
+// need them declared + initialized at the start so I can record the data properly as it runs. 
 
     public static ArrayList<Runnable> gaugesToUse = new ArrayList<>();
 
     public static void startobdRead(){
         try {
             socket = SerialPort.getCommPort("COM6"); //outputstream
-            // the input is com5
             socket.setBaudRate(9600);
             if(!socket.openPort()){
                 System.out.println("Didn't open port!!");
@@ -50,7 +49,6 @@ public class ObdReader {
             rawCommand(inputStream, outputStream, "ATAT1");
             rawCommand(inputStream, outputStream, "ATSP0");
            
-            System.out.println(rawCommand(inputStream, outputStream, "010C"));
 
             System.out.println("Connected yo");
         } catch (Exception e) {
@@ -70,7 +68,7 @@ public class ObdReader {
         out.write((cmd + "\r").getBytes());
         out.flush();
 
-        StringBuilder response = new StringBuilder();
+        StringBuilder response = new StringBuilder(); //found this thingy on google, but it's basically just a string
         long end = System.currentTimeMillis() + 5000;
 
         while (System.currentTimeMillis() < end) {
@@ -83,7 +81,7 @@ public class ObdReader {
                     return result;
                 }
             }
-           // Thread.sleep(20);
+           Thread.sleep(50);
         }
 
         throw new RuntimeException("Timeout waiting for response to " + cmd +
@@ -125,9 +123,8 @@ public class ObdReader {
         //manifold - barometric = boost
         try {
             String manifoldCMD = rawCommand(inputStream,outputStream, "010B");
-            Poop manifoldPoop = new Poop(manifoldCMD);
-            boostKPA = manifoldPoop.getA() - 14.7346;
-            
+            Parser manifoldParser = new Parser(manifoldCMD,1);
+            boostKPA = manifoldParser.getA() - 14.7346; //couldnt get active baro, so just going off a constant.
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -136,28 +133,13 @@ public class ObdReader {
         Platform.runLater(() -> boostValue.set(boostPSI));
     }
 
-    // public static void startBoostThread(){
-    //     Thread boostThread = new Thread(() -> {
-    //         while(true) {
-    //             getBoost();
-    //             try {
-    //                 Thread.sleep(200);
-    //             } catch (Exception e) {
-    //                 break;
-    //             }
-    //         }
-    //     });
-    //     boostThread.setDaemon(true);
-    //     boostThread.start();
-    // }
-
     public static void getRevs(){
         try {
             String revCMD = rawCommand(inputStream, outputStream, "010C");
 
-            Poop revPoop = new Poop(revCMD);
+            Parser revParser = new Parser(revCMD,2);
 
-            double rpms = (256*revPoop.getA() + revPoop.getB())/4;
+            double rpms = (256*revParser.getA() + revParser.getB())/4;
             Platform.runLater(() -> revValue.set(rpms));
         } catch (Exception e) {
             System.out.println(e);
@@ -165,12 +147,16 @@ public class ObdReader {
         
     }
 
+// I called it "dodat" because it "does dat (that)". If I change it now, I would have to change a lot of names everywhere.
+// it's basically just a polling method that gets all the info and records it too.
+//utilizes a thread for it.
     public static void dodat(){
         Thread dodatThread = new Thread(() -> {
             while(true){
                 for(Runnable x: gaugesToUse){
                     x.run();
                 }
+                SaveManager.recordValues();
                 try {
                     Thread.sleep(200);
                 } catch (Exception e) {
@@ -182,26 +168,11 @@ public class ObdReader {
         dodatThread.start();
     }
 
-    // public static void startRpmsThread(){
-    //     Thread rpmThread = new Thread(() -> {
-    //         while(true){
-    //             getRevs();
-    //             try {
-    //                 Thread.sleep(200);
-    //             } catch (Exception e) {
-    //                 break;
-    //             }
-    //         }
-    //     });
-    //     rpmThread.setDaemon(true);
-    //     rpmThread.start();
-    // }
-    
     public static void getFuelTrim(){
         try {
           String trimCMD = rawCommand(inputStream, outputStream, "0106");  
-          Poop trimPoop = new Poop(trimCMD);
-          double fuelTrim = (100.0/128.0)*trimPoop.getA()-100;
+          Parser trimParser = new Parser(trimCMD,1);
+          double fuelTrim = (100.0/128.0)*trimParser.getA()-100;
           Platform.runLater(() -> trimValue.set(fuelTrim));
         } catch (Exception e) {
             System.out.println(e);
@@ -211,8 +182,8 @@ public class ObdReader {
     public static void getCoolantTemp(){
         try {
             String coolantCMD = rawCommand(inputStream, outputStream, "0105");
-            Poop coolantPoop = new Poop(coolantCMD);
-            double coolantTemp = coolantPoop.getA()-40.0;
+            Parser coolantParser = new Parser(coolantCMD,1);
+            double coolantTemp = coolantParser.getA()-40.0;
             Platform.runLater(() -> coolantValue.set(coolantTemp));
         } catch (Exception e) {
             System.out.println(e);
@@ -222,8 +193,8 @@ public class ObdReader {
     public static void getFuelPressure(){
         try {
             String fuelPressureCMD = rawCommand(inputStream, outputStream, "010A");
-            Poop pressurePoop = new Poop(fuelPressureCMD);
-            double fuelPressure = pressurePoop.getA()*3.0;
+            Parser pressureParser = new Parser(fuelPressureCMD,1);
+            double fuelPressure = pressureParser.getA()*3.0;
             Platform.runLater(() -> fuelPressureValue.set(fuelPressure));
         } catch (Exception e) {
             System.out.println(e);
@@ -233,8 +204,8 @@ public class ObdReader {
     public static void getEngineLoad(){
         try {
             String engineLoadCMD = rawCommand(inputStream, outputStream, "0104");
-            Poop loadPoop = new Poop(engineLoadCMD);
-            double engineLoad = 100.0/255.0 * loadPoop.getA();
+            Parser loadParser = new Parser(engineLoadCMD,1);
+            double engineLoad = 100.0/255.0 * loadParser.getA();
             Platform.runLater(() -> loadValue.set(engineLoad));
         } catch (Exception e) {
             System.out.println(e);
@@ -244,8 +215,8 @@ public class ObdReader {
     public static void getVehicleSpeed(){
         try {
             String vehicleSpeedCMD = rawCommand(inputStream, outputStream, "010D");
-            Poop speedPoop = new Poop(vehicleSpeedCMD);
-            double vehicleSpeed = speedPoop.getA();
+            Parser speedParser = new Parser(vehicleSpeedCMD,1);
+            double vehicleSpeed = speedParser.getA();
             Platform.runLater(() -> loadValue.set(vehicleSpeed));
         } catch (Exception e) {
             System.out.println(e);
@@ -255,8 +226,9 @@ public class ObdReader {
     public static void getThrottlePosition(){
         try {
             String throttlePositionCMD = rawCommand(inputStream, outputStream, "0111");
-            Poop posPoop = new Poop(throttlePositionCMD);
-            double throttlePosition = 100.0/255.0 * posPoop.getA();
+            Parser posParser = new Parser(throttlePositionCMD,1);
+            System.out.println(throttlePositionCMD);
+            double throttlePosition = 100.0/255.0 * posParser.getA();
             Platform.runLater(() -> loadValue.set(throttlePosition));
         } catch (Exception e) {
             System.out.println(e);
@@ -266,37 +238,11 @@ public class ObdReader {
     public static void getTimingPosition(){
         try {
             String timingCMD = rawCommand(inputStream, outputStream, "010E");
-            Poop timingPoop = new Poop(timingCMD);
-            double engineTiming = (timingPoop.getA()/2.0)-64;
+            Parser timingParser = new Parser(timingCMD,1);
+            double engineTiming = (timingParser.getA()/2.0)-64;
             Platform.runLater(() -> loadValue.set(engineTiming));
         } catch (Exception e) {
             System.out.println(e);
         }
     }
-
-    // old poop
-    // public static String getFuelTrim(){
-    //     //returns fuel trim in format "stft" 
-    //     FuelTrimCommand stft = new FuelTrimCommand(FuelTrim.SHORT_TERM_BANK_1);
-    //     FuelTrimCommand ltft = new FuelTrimCommand(FuelTrim.LONG_TERM_BANK_1); //ignore
-    //     String shortFuelTrim = stft.getFormattedResult();
-    //     String longFuelTrim = ltft.getFormattedResult();//ignore for now
-    //     return (shortFuelTrim+"");
-    // }
-
-    // public static String timingPosition(){
-    //     TimingAdvanceCommand timing = new TimingAdvanceCommand();
-    //     String timingDegrees = "";
-    //     try {
-    //     timing.run(socket.getInputStream(),socket.getOutputStream());
-    //     timingDegrees = timing.getCalculatedResult();
-    //     System.out.println(timingDegrees);
-    //     timingDegrees = timing.getFormattedResult();
-    //     } catch (Exception e) {
-    //         System.out.println(e);
-    //     }
-    //     return timingDegrees;
-    // }
-
-
 }
