@@ -10,7 +10,7 @@
    <children>
       <VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="600.0">
          <children>
-            <ListView fx:id="doodoo" prefHeight="361.0" prefWidth="600.0" />
+            <ListView fx:id="parList" prefHeight="361.0" prefWidth="600.0" />
             <Button fx:id="addAddGaugeButton" mnemonicParsing="false" onAction="#doTheThing" prefHeight="26.0" prefWidth="585.0" text="Add Gauge">
                <VBox.margin>
                   <Insets top="6.0" />

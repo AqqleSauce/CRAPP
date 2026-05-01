@@ -15,7 +15,7 @@ public class SecondaryController {
     @FXML
     private ListView<String> parList;
     
-    ObservableList<String> names = FXCollections.observableArrayList(
+    private static final ObservableList<String> names = FXCollections.observableArrayList(
       "Boost Pressure",
       "Fuel Trim",
       "Fuel Pressure",
@@ -26,6 +26,10 @@ public class SecondaryController {
       "Throttle Position",
       "Timing Position"
     );
+
+    public static ObservableList<String> getMetricNames(){
+      return names;
+    }
 
     @FXML
     void initialize(){

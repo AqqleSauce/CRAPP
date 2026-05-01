@@ -13,7 +13,7 @@ import javafx.stage.Stage;
  */
 public class App extends Application {
 
-    private static Scene scene;
+    static Scene scene;
 
     @SuppressWarnings("exports")
     @Override
@@ -21,8 +21,9 @@ public class App extends Application {
         scene = new Scene(loadFXML("mainScreen"));
         stage.setScene(scene);
         stage.show();
-        ObdReader.startobdRead();
-        // SaveManager.startDrive();
+        //ObdReader.startobdRead();
+        SaveManager.startDrive();
+        stage.setOnCloseRequest(event -> SaveManager.stopRecord());
     }
 
     static void setRoot(String fxml) throws IOException {

@@ -8,26 +8,26 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class SaveManager {
-    private static final Path saveDirectory = Paths.get("saves");
+    private static final Path saveDirectory = Paths.get("src","main","java","com","svgs","saves");
     private static BufferedWriter writer;
     
     public static void startDrive() throws IOException{
         Files.createDirectories(saveDirectory);
         String timeDate = LocalDateTime.now()
         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"));
-         // got this cool way to get time stamps from stack overflow, it names saves by the timestamp they started at.
+        // got this cool way to get time stamps from stack overflow, it names saves by the timestamp they started at.
+        
         Path file = saveDirectory.resolve("drive-"+timeDate+".csv");
         writer = Files.newBufferedWriter(file);
         writer.write("timeMillis,boost,rpm,fuelTrim,fuelPressure,coolant,load,speed,throttle,timing");
         writer.newLine();
     }
 
-    public static void recordValues(){
+    public static void recordValues() throws IOException{
         if (writer == null){
             return;
         }
         
-        try {
             writer.write(System.currentTimeMillis()+",");
             writer.write(ObdReader.boostProperty().get()+","+
             ObdReader.revProperty().get()+","+
@@ -39,9 +39,6 @@ public class SaveManager {
             ObdReader.throttleProperty().get()+","+
             ObdReader.timingProperty().get());
             writer.newLine();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
         
     }
 

@@ -25,7 +25,8 @@ public class PrimaryController{
     @FXML
     private HBox vbux;
 
-    
+     @FXML
+    private Button saveButton;
 
     void makeGauge(ActionEvent event) {
         Gauge gauge = GaugeBuilder.create()
@@ -50,6 +51,11 @@ public class PrimaryController{
     void initialize(){
         decider(); 
         ObdReader.dodat();
+    }
+
+    @FXML
+    void goToSaves(ActionEvent event) throws IOException{
+        App.setRoot("saveView");
     }
 
     public void decider(){

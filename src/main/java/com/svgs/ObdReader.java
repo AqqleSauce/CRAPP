@@ -156,9 +156,10 @@ public class ObdReader {
                 for(Runnable x: gaugesToUse){
                     x.run();
                 }
-                SaveManager.recordValues();
+               
                 try {
                     Thread.sleep(200);
+                    SaveManager.recordValues();
                 } catch (Exception e) {
                     break;
                 }
@@ -172,7 +173,7 @@ public class ObdReader {
         try {
           String trimCMD = rawCommand(inputStream, outputStream, "0106");  
           Parser trimParser = new Parser(trimCMD,1);
-          double fuelTrim = (100.0/128.0)*trimParser.getA()-100;
+          double fuelTrim = (100.0/128.0) * trimParser.getA()-100;
           Platform.runLater(() -> trimValue.set(fuelTrim));
         } catch (Exception e) {
             System.out.println(e);
@@ -227,7 +228,6 @@ public class ObdReader {
         try {
             String throttlePositionCMD = rawCommand(inputStream, outputStream, "0111");
             Parser posParser = new Parser(throttlePositionCMD,1);
-            System.out.println(throttlePositionCMD);
             double throttlePosition = 100.0/255.0 * posParser.getA();
             Platform.runLater(() -> loadValue.set(throttlePosition));
         } catch (Exception e) {
